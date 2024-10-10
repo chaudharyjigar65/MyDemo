@@ -1,85 +1,70 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
- class ParkingSystem {
-
-    static int totalSlots, availableSlots;
-    static ArrayList<String> parkedCars = new ArrayList<>();
-
+ class SupermarketBilling {
     public static void main(String[] args) {
+        ArrayList items = new ArrayList();
+        Scanner scanner = new Scanner(System.in);
+        double total = 0;
+        double subTotal = 0;
+        double tax = 0;
+        double discount = 0;
+        double finalTotal = 0;
 
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the total number of parking slots:");
-        totalSlots = sc.nextInt();
-        availableSlots = totalSlots;
+        System.out.println("Welcome to the Supermarket Billing System");
+        System.out.println("Enter the item details:");
 
         while (true) {
-            System.out.println("\nWhat would you like to do?");
-            System.out.println("1. Park a car");
-            System.out.println("2. Remove a car");
-            System.out.println("3. View parked cars");
-            System.out.println("4. Exit");
-            int choice = sc.nextInt();
-
-            switch (choice) {
-                case 1:
-                    parkCar();
-                    break;
-                case 2:
-                    removeCar();
-                    break;
-                case 3:
-                    viewParkedCars();
-                    break;
-                case 4:
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            System.out.print("Enter item name: ");
+            String itemName = scanner.next();
+            if (itemName.equalsIgnoreCase("exit")) {
+                break;
             }
+            System.out.print("Enter item quantity: ");
+            int itemQuantity = scanner.nextInt();
+            System.out.print("Enter item price: ");
+            double itemPrice = scanner.nextDouble();
+            Item item = new Item(itemName, itemQuantity, itemPrice);
+            items.add(item);
+            subTotal += itemQuantity * itemPrice;
+
+            System.out.println("Item: " + itemName + ", Quantity: " + itemQuantity + ", Price: $" + itemPrice);
         }
+
+        System.out.print("Enter the tax rate(%): ");
+        double taxRate = scanner.nextDouble();
+        tax = (taxRate * subTotal) / 100;
+        System.out.print("Enter the discount amount($): ");
+        discount = scanner.nextDouble();
+
+        finalTotal = subTotal + tax - discount;
+        System.out.println("Subtotal: $" + subTotal);
+        System.out.println("Tax: $" + tax);
+        System.out.println("Discount: $" + discount);
+        System.out.println("Total: $" + finalTotal);
+    }
+}
+
+class Item {
+    private String name;
+    private int quantity;
+    private double price;
+
+    public Item(String name, int quantity, double price) {
+        this.name = name;
+        this.quantity = quantity;
+        this.price = price;
     }
 
-    public static void parkCar() {
-        if (availableSlots == 0) {
-            System.out.println("Sorry, there are no available parking slots.");
-            return;
-        }
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the license plate number of the car:");
-        String licensePlate = sc.nextLine();
-        parkedCars.add(licensePlate);
-        availableSlots--;
-        System.out.println("Car parked successfully. Available slots: " + availableSlots);
+    public String getName() {
+        return name;
     }
 
-    public static void removeCar() {
-        if (availableSlots == totalSlots) {
-            System.out.println("There are no parked cars.");
-            return;
-        }
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the license plate number of the car to be removed:");
-        String licensePlate = sc.nextLine();
-        if (parkedCars.contains(licensePlate)) {
-            parkedCars.remove(licensePlate);
-            availableSlots++;
-            System.out.println("Car removed successfully. Available slots: " + availableSlots);
-        } else {
-            System.out.println("The car is not parked here.");
-        }
+    public int getQuantity() {
+        return quantity;
     }
 
-    public static void viewParkedCars() {
-        if (availableSlots == totalSlots) {
-            System.out.println("There are no parked cars.");
-            return;
-        }
-
-        System.out.println("Parked cars:");
-        for (String licensePlate : parkedCars) {
-            System.out.println(licensePlate);
-        }
+    public double getPrice() {
+        return price;
     }
 }
