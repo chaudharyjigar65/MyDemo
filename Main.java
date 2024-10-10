@@ -1,70 +1,100 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
- class SupermarketBilling {
-    public static void main(String[] args) {
-        ArrayList items = new ArrayList();
-        Scanner scanner = new Scanner(System.in);
-        double total = 0;
-        double subTotal = 0;
-        double tax = 0;
-        double discount = 0;
-        double finalTotal = 0;
+public class HangmanGame extends JFrame implements ActionListener {
+    final String[] words = {"hangman", "java", "swing", "programming", "openai"};
+    private String wordToGuess;
+    private int guessesLeft = 6;
+    private StringBuilder hiddenWord;
 
-        System.out.println("Welcome to the Supermarket Billing System");
-        System.out.println("Enter the item details:");
+    final JLabel hiddenWordLabel;
+    pr JLabel guessesLeftLabel;
+    private JTextField guessTextField;
+    private JButton guessButton;
 
-        while (true) {
-            System.out.print("Enter item name: ");
-            String itemName = scanner.next();
-            if (itemName.equalsIgnoreCase("exit")) {
-                break;
-            }
-            System.out.print("Enter item quantity: ");
-            int itemQuantity = scanner.nextInt();
-            System.out.print("Enter item price: ");
-            double itemPrice = scanner.nextDouble();
-            Item item = new Item(itemName, itemQuantity, itemPrice);
-            items.add(item);
-            subTotal += itemQuantity * itemPrice;
+    public HangmanGame() {
+        setTitle("Hangman Game");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
 
-            System.out.println("Item: " + itemName + ", Quantity: " + itemQuantity + ", Price: $" + itemPrice);
+        hiddenWordLabel = new JLabel();
+        guessesLeftLabel = new JLabel("Guesses Left: " + guessesLeft);
+        guessTextField = new JTextField(10);
+        guessButton = new JButton("Guess");
+
+        guessButton.addActionListener(this);
+        guessTextField.addActionListener(this);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new FlowLayout());
+        mainPanel.add(hiddenWordLabel);
+        mainPanel.add(guessesLeftLabel);
+        mainPanel.add(guessTextField);
+        mainPanel.add(guessButton);
+
+        getContentPane().add(mainPanel);
+
+        initializeGame();
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void initializeGame() {
+        wordToGuess = words[(int) (Math.random() * words.length)];
+        hiddenWord = new StringBuilder();
+        for (int i = 0; i < wordToGuess.length(); i++) {
+            hiddenWord.append("_");
         }
-
-        System.out.print("Enter the tax rate(%): ");
-        double taxRate = scanner.nextDouble();
-        tax = (taxRate * subTotal) / 100;
-        System.out.print("Enter the discount amount($): ");
-        discount = scanner.nextDouble();
-
-        finalTotal = subTotal + tax - discount;
-        System.out.println("Subtotal: $" + subTotal);
-        System.out.println("Tax: $" + tax);
-        System.out.println("Discount: $" + discount);
-        System.out.println("Total: $" + finalTotal);
-    }
-}
-
-class Item {
-    private String name;
-    private int quantity;
-    private double price;
-
-    public Item(String name, int quantity, double price) {
-        this.name = name;
-        this.quantity = quantity;
-        this.price = price;
+        hiddenWordLabel.setText(hiddenWord.toString());
+        guessesLeft = 6;
+        guessesLeftLabel.setText("Guesses Left: " + guessesLeft);
     }
 
-    public String getName() {
-        return name;
+    private void updateHiddenWord(char guess) {
+        boolean found = false;
+        for (int i = 0; i < wordToGuess.length(); i++) {
+            if (wordToGuess.charAt(i) == guess) {
+                hiddenWord.setCharAt(i, guess);
+                found = true;
+            }
+        }
+        hiddenWordLabel.setText(hiddenWord.toString());
+        if (!found) {
+            guessesLeft--;
+            guessesLeftLabel.setText("Guesses Left: " + guessesLeft);
+            if (guessesLeft == 0) {
+                endGame("You lose! The word was: " + wordToGuess);
+            }
+        } else if (hiddenWord.toString().equals(wordToGuess)) {
+            endGame("Congratulations! You won!");
+        }
     }
 
-    public int getQuantity() {
-        return quantity;
+    private void endGame(String message) {
+        guessTextField.setEnabled(false);
+        guessButton.setEnabled(false);
+        JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        initializeGame();
+        guessTextField.setEnabled(true);
+        guessButton.setEnabled(true);
+        guessTextField.requestFocus();
     }
 
-    public double getPrice() {
-        return price;
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == guessButton || e.getSource() == guessTextField) {
+            String guessText = guessTextField.getText();
+            if (guessText.length() > 0) {
+                char guess = guessText.charAt(0);
+                updateHiddenWord(guess);
+                guessTextField.setText("");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(HangmanGame::new);
     }
 }
